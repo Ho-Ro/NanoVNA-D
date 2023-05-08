@@ -1,99 +1,69 @@
-NanoVNA - Very tiny handheld Vector Network Analyzer
-==========================================================
-[release]: https://github.com/DiSlord/NanoVNA-D/releases
+NanoVNA - Modifications for devices without SD card slot
+========================================================
 
 <div align="center">
-<img src="/doc/nanovna.jpg" width="480px">
+<img src="/doc/8_slots.png" width="480px">
 </div>
 
 # About
 
-NanoVNA is very tiny handheld Vector Network Analyzer (VNA). It is
-standalone with lcd display, portable device with battery. This
-project aim to provide an RF gadget but useful instrument for
-enthusiast.
-
-This repository contains source of NanoVNA firmware.
+This repository contains the source of NanoVNA firmware based on
+[DiSlord's development](https://github.com/DiSlord/NanoVNA-D)
+with modifications for use with NanoVNA-H devices without SD card slot
+as well as `bin`, `hex` and `dfu` firmware compiled on my Debian stable system.
 
 ## Prepare ARM Cross Tools
 
-**UPDATE**: Recent gcc version works to build NanoVNA, no need old version.
-
-### MacOSX
-
-Install cross tools and firmware updating tool.
-
-    $ brew tap px4/px4
-    $ brew install gcc-arm-none-eabi-80
-    $ brew install dfu-util
-
-### Linux (ubuntu)
-
-Download arm cross tools from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
-
-    $ wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2018q4/gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2
-    $ sudo tar xfj gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2 -C /usr/local
-    $ PATH=/usr/local/gcc-arm-none-eabi-8-2018-q4-major/bin:$PATH
-    $ sudo apt install -y dfu-util
 ### Debian
+
+Do this once:
+
     $ sudo apt install gcc-arm-none-eabi
     $ sudo apt install -y dfu-util
 
 ## Fetch source code
 
-Fetch source and submodule.
+Fetch source and submodule once:
 
-    $ git clone https://github.com/DiSlord/NanoVNA-D.git
-    $ cd NanoVNA
-    $ git submodule update --init --recursive
+    git clone https://github.com/Ho-Ro/NanoVNA-D.git
+    cd NanoVNA-D
+    git submodule update --init --recursive
+    git checkout NanoVNA_noSD
+
+Keep your source code up to date:
+
+    git pull
 
 ## Build
 
-Just make in the directory.
+Just type in the directory.
 
-    $ make
+    make -j
 
 ## Flash firmware
 
-First, make device enter DFU mode by one of following methods.
+1. First, connect the device and enter DFU mode by one of following methods.
 
-* Jumper BOOT0 pin at powering device
-* Select menu Config->DFU (needs recent firmware)
+   + Select menu Config->DFU (needs recent firmware).
+   + Jumper BOOT0 pin to VDD at powering device.
+   + With a minor HW modification just press jog switch while powering
+     (solder a wire from BOOT0 to the center pin of the jog switch).
 
-Then, flash firmware using dfu-util via USB.
+2. Then, flash firmware using dfu-util via USB.
 
-    $ dfu-util -d 0483:df11 -a 0 -s 0x08000000:leave -D build/ch.bin
+    dfu-util -d 0483:df11 -a 0 -s 0x08000000:leave -D NanoVNA-H-noSD.bin
 
-Or simply use make.
+Or - assumed the NanoVNA is on `/dev/ttyACM0` - simply type:
 
-    $ make flash
+    make flash
 
-## Companion Tools
 
-There are seveal numbers of great companion PC tools from third-party.
 
-* [NanoVNA-App software](https://github.com/OneOfEleven/NanoVNA-H/blob/master/Release/NanoVNA-App.rar) by OneOfEleven
-* [NanoVNASharp Windows software](https://drive.google.com/drive/folders/1IZEtx2YdqchaTO8Aa9QbhQ8g_Pr5iNhr) by hugen79
-* [NanoVNA WebSerial/WebUSB](https://github.com/cho45/NanoVNA-WebUSB-Client) by cho45
-* [Android NanoVNA app](https://play.google.com/store/apps/details?id=net.lowreal.nanovnawebapp) by cho45
-* [NanoVNASaver](https://github.com/mihtjel/nanovna-saver) by mihtjel
-* [TAPR VNAR4](https://groups.io/g/nanovna-users/files/NanoVNA%20PC%20Software/TAPR%20VNA) supports NanoVNA by erikkaashoek
-* see [python](/python/README.md) directory to use NanoVNA with Python and Jupyter Notebook.
+## Parse the menu structure
 
-## Documentation
+This is a quick tool to show the menu structure of the FW with all possible menu entries:
 
-* [NanoVNA User Guide(ja)](https://cho45.github.io/NanoVNA-manual/) by cho45. [(en:google translate)](https://translate.google.com/translate?sl=ja&tl=en&u=https%3A%2F%2Fcho45.github.io%2FNanoVNA-manual%2F)
-
-## Reference
-
-* [Schematics](/doc/nanovna-sch.pdf)
-* [PCB Photo](/doc/nanovna-pcb-photo.jpg)
-* [Block Diagram](/doc/nanovna-blockdiagram.png)
-* Kit available from https://ttrf.tk/kit/nanovna
-
-## Note
-
-Hardware design material is disclosed to prevent bad quality clone. Please let me know if you would have your own unit.
+    parse_menu.py
 
 ## Credit
 * [@DiSlord](https://github.com/DiSlord/)

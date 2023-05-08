@@ -8,4 +8,12 @@ python
 *.ipynb
 TAGS
 .emacs-dirvars
-*png
+.kdev
+*.kdev4
+*.bak
+*.diff
+*.new
+*.old
+*.orig
+*.sh
+hex2dfu

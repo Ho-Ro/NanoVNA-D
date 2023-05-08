@@ -7,7 +7,7 @@
 ifeq ($(TARGET),)
   TARGET = F072
 endif
-#TARGET=F303
+TARGET=F072
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
@@ -67,7 +67,7 @@ endif
 ##############################################################################
 
 ifeq ($(VERSION),)
-  VERSION="$(shell git describe --tags)"
+VERSION = "$(shell grep -E '#define[[:space:]]+VERSION[[:space:]]+\"[0-9]*\.[0-9]*\.[0-9]*' main.c | cut -d\" -f2)"
 endif
 
 ##############################################################################
@@ -97,9 +97,9 @@ endif
 
 # Define project name here
 ifeq ($(TARGET),F303)
-  PROJECT = H4
+  PROJECT = NanoVNA-H4-noSD
 else
-  PROJECT = H
+  PROJECT = NanoVNA-H-noSD
 endif
 
 # Imported source files and paths
@@ -242,7 +242,7 @@ CPPWARN = -Wall -Wextra -Wundef
 ifeq ($(TARGET),F303)
  UDEFS = -DARM_MATH_CM4 -DVERSION=\"$(VERSION)\" -DNANOVNA_F303
 else
- UDEFS = -DARM_MATH_CM0 -DVERSION=\"$(VERSION)\" 
+ UDEFS = -DARM_MATH_CM0 -DVERSION=\"$(VERSION)\"
 endif
 #Enable if use RTC and need auto select source LSE or LSI
 UDEFS+= -DVNA_AUTO_SELECT_RTC_SOURCE
@@ -269,17 +269,45 @@ ULIBS = -lm
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC
 include $(RULESPATH)/rules.mk
 
-flash: build/$(PROJECT).bin
-	dfu-util -d 0483:df11 -a 0 -s 0x08000000:leave -D build/$(PROJECT).bin
+.PHONY: all
+all:	bin dfu hex
 
-dfu:
-	-@printf "reset dfu\r" >/dev/cu.usbmodem401
+# build the bin file needed for flash
+.PHONY: bin
+bin: build/$(PROJECT).bin
+	@chmod -x $<
+	@cp $< .
 
-TAGS: Makefile
-ifeq ($(TARGET),F303)
-	@etags *.[ch] NANOVNA_STM32_F303/*.[ch] $(shell find ChibiOS/os/hal/ports/STM32/STM32F3xx ChibiOS/os -name \*.\[ch\] -print) 
-else
-	@etags *.[ch] NANOVNA_STM32_F072/*.[ch] $(shell find ChibiOS/os/hal/ports/STM32/STM32F0xx ChibiOS/os -name \*.\[ch\] -print) 
-endif
-	@ls -l TAGS
+# build hex, show the remaining RAM space
+.PHONY: hex
+hex: build/$(PROJECT).hex
+	@cp $< .
+	@echo "\nCheck free RAM space (= .heap)\n"
+	@grep \\.heap build/$(PROJECT).map
+	@echo "\nCheck number of calibration slots\n"
+	@./get_SAVEAREA_MAX.sh
 
+dfu: build/$(PROJECT).dfu
+	@cp $< .
+
+# build the hex -> dfu converter program
+hex2dfu: hex2dfu.c
+	-@gcc -DED25519_SUPPORT=0 $< -o $@
+
+# convert *.hex to *.dfu
+build/$(PROJECT).dfu: build/$(PROJECT).hex hex2dfu
+	@echo "Creating build/$(PROJECT).dfu\n"
+	@hex2dfu -i $< -o $@
+	@cp $< .
+
+# switch device into DFU mode and wait to establish the DFU device
+# download the bin file to the device flash
+.PHONY: flash
+flash: build/$(PROJECT).bin dfu
+	-@test -c /dev/ttyACM0 && printf "reset dfu\r" >/dev/ttyACM0 && sleep 2
+	dfu-util -d 0483:df11 -a 0 -s 0x08000000:leave -D $<
+
+# remove all build artifacts
+.phony: distclean
+distclean: clean
+	rm -f hex2dfu *.bin *.hex *.dfu
