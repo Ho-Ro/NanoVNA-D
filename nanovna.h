@@ -47,7 +47,9 @@
 // Add RTC backup registers support
 #define __USE_BACKUP__
 // Add SD card support, req enable RTC (additional settings for file system see FatFS lib ffconf.h)
+#ifndef __NO_SD_CARD__
 #define __USE_SD_CARD__
+#endif
 // If enabled serial in halconf.h, possible enable serial console control
 #define __USE_SERIAL_CONSOLE__
 // Add show y grid line values option

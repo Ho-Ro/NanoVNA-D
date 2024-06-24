@@ -142,11 +142,13 @@ const char *info_about[]={
   "ADC:"define_to_STR(AUDIO_ADC_FREQ_K1)"k, "\
   "Lcd:"define_to_STR(LCD_WIDTH)"x"define_to_STR(LCD_HEIGHT)\
   "]",  "Build Time: " __DATE__ " - " __TIME__,
+  "Modification for no SD devices by:",
+  "  https://github.com/Ho-Ro/NanoVNA-D",
 //  "Kernel: " CH_KERNEL_VERSION,
 //  "Compiler: " PORT_COMPILER_NAME,
-  "Architecture: " PORT_ARCHITECTURE_NAME " Core Variant: " PORT_CORE_VARIANT_NAME,
+//  "Architecture: " PORT_ARCHITECTURE_NAME " Core Variant: " PORT_CORE_VARIANT_NAME,
 //  "Port Info: " PORT_INFO,
-  "Platform: " PLATFORM_NAME,
+//  "Platform: " PLATFORM_NAME,
   0 // sentinel
 };
 
