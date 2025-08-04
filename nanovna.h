@@ -44,12 +44,14 @@
 //#define __VNA_ENABLE_DAC__
 // Allow enter to DFU from menu or command
 #define __DFU_SOFTWARE_MODE__
+#ifndef __NO_SD_CARD__
 // Add RTC clock support
 #define __USE_RTC__
 // Add RTC backup registers support
 #define __USE_BACKUP__
 // Add SD card support, req enable RTC (additional settings for file system see FatFS lib ffconf.h)
 #define __USE_SD_CARD__
+#endif
 // Use unique serial string for USB
 #define __USB_UID__
 // If enabled serial in halconf.h, possible enable serial console control
