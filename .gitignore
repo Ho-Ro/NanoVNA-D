@@ -1,6 +1,8 @@
 *~
 .DS_Store
+.circleci
 .dep
+.vscode
 build*
 test
 python
@@ -8,4 +10,13 @@ python
 *.ipynb
 TAGS
 .emacs-dirvars
-*png
+.kdev
+*.kdev4
+*.bak
+*.diff
+*.new
+*.old
+*.orig
+*.rej
+*.sh
+hex2dfu

@@ -186,7 +186,9 @@ static char    kp_buf[TXTINPUT_LEN+1];  // !!!!!! WARNING size must be + 2 from 
 static uint8_t ui_mode = UI_NORMAL;
 static const keypads_t *keypads;
 static uint8_t keypad_mode;
+#ifdef __USE_SD_CARD__
 static uint8_t keyboard_temp;           // Use for custom keyboard processing
+#endif
 static uint8_t menu_current_level = 0;
 static int8_t  selection = -1;
 
@@ -2024,6 +2026,9 @@ const menuitem_t menu_save[] = {
 #if SAVEAREA_MAX > 6
   { MT_ADV_CALLBACK, 6, "Empty %d", menu_save_acb },
 #endif
+#if SAVEAREA_MAX > 7
+  { MT_ADV_CALLBACK, 7, "Empty %d", menu_save_acb },
+#endif
   { MT_NEXT, 0, NULL, menu_back } // next-> menu_back
 };
 
@@ -2045,6 +2050,9 @@ const menuitem_t menu_recall[] = {
 #endif
 #if SAVEAREA_MAX > 6
   { MT_ADV_CALLBACK, 6, "Empty %d", menu_recall_acb },
+#endif
+#if SAVEAREA_MAX > 7
+  { MT_ADV_CALLBACK, 7, "Empty %d", menu_recall_acb },
 #endif
   { MT_NEXT, 0, NULL, menu_back } // next-> menu_back
 };
